@@ -3,11 +3,21 @@
 #include "vm.hpp"
 
 VM::VM() {
-    
+
 }
 
 void VM::run(std::string & path) {
     std::cout << "file_path = " << path << std::endl;
+}
+
+// Essa função obtém o valor de um registrador.
+int16_t VM::getRegVal(RegID id) {
+    
+}
+
+// Essa função estabelece o valor de um operando.
+void VM::setRegVal(RegID id, int16_t val) {
+
 }
 
 /*

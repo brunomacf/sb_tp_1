@@ -11,6 +11,10 @@ enum class OperandsType {
   NONE, REG, MEM, REG_MEM, MEM_REG, REG_REG, MEM_VAL, REG_VAL, VAL
 };
 
+enum class RegID {
+    AL, AH, AX, BH, BL, BX, CL, CH, CX
+}
+
 // Máquina virtual
 class VM {
 private:
@@ -22,6 +26,12 @@ private:
 
     // Flags
     bool ZF, SF;
+
+    // Essa função obtém o valor de um registrador.
+    int16_t getRegVal(RegID id);
+
+    // Essa função estabelece o valor de um operando.
+    void setRegVal(RegID id, int16_t val);
 
 public:
     VM();
