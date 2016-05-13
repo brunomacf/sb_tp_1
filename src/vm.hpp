@@ -1,6 +1,5 @@
 #include <string>
 #include <stdint.h>
-#include "loader.hpp"
 
 #ifndef VM_H
 #define VM_H
@@ -10,10 +9,6 @@
 enum class OperandsType {
   NONE, REG, MEM, REG_MEM, MEM_REG, REG_REG, MEM_VAL, REG_VAL, VAL
 };
-
-enum class RegID {
-    AL, AH, AX, BH, BL, BX, CL, CH, CX
-}
 
 // Máquina virtual
 class VM {
@@ -28,10 +23,50 @@ private:
     bool ZF, SF;
 
     // Essa função obtém o valor de um registrador.
-    int16_t getRegVal(RegID id);
+    int16_t getRegVal(int16_t reg);
 
-    // Essa função estabelece o valor de um operando.
-    void setRegVal(RegID id, int16_t val);
+    // Seta o valor de um registrador.
+    void setRegVal(int16_t reg, int16_t val);
+
+    // Essa função obtém o valor de um registrador.
+    void getVals(OperandsType type, int16_t op1, int16_t op2, int16_t * val1, int16_t * val2);
+
+    // Configura um valor de acordo com o tipo.
+    void setVal(OperandsType type, int16_t op, int16_t val);
+
+    // Seta as flags
+    void setFlags(int16_t val);
+
+    // Essa função carrega o arquivo binário na memória.
+    int load(std::string & path);
+
+    // Essa função decodifica a instrução e obtém quantos operandos ela exige.
+    int decode(int16_t * opId, int16_t * opsType, int16_t * op1, int16_t * op2);
+
+    // Essa função executa a próxima instrução.
+    void execute(int16_t opId, int16_t opsType, int16_t op1, int16_t op2);
+
+    // Funções que executam cada uma das instruções definidas na especificação.
+    void mov_fn(OperandsType type, int16_t op1, int16_t op2);
+    void add_fn(OperandsType type, int16_t op1, int16_t op2);
+    void sub_fn(OperandsType type, int16_t op1, int16_t op2);
+    void and_fn(OperandsType type, int16_t op1, int16_t op2);
+    void or_fn(OperandsType type, int16_t op1, int16_t op2);
+    void cmp_fn(OperandsType type, int16_t op1, int16_t op2);
+    void mul_fn(OperandsType type, int16_t op1);
+    void div_fn(OperandsType type, int16_t op1);
+    void not_fn(OperandsType type, int16_t op1);
+    void jmp_fn(int16_t op1);
+    void jz_fn(int16_t op1);
+    void js_fn(int16_t op1);
+    void call_fn(int16_t op1);
+    void push_fn(OperandsType type, int16_t op1);
+    void pop_fn(OperandsType type, int16_t op1);
+    void read_fn(OperandsType type, int16_t op1);
+    void write_fn(OperandsType type, int16_t op1);
+    void ret_fn();
+    void dump_fn();
+    void htl_fn();
 
 public:
     VM();
