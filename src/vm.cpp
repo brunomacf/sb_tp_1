@@ -1,9 +1,12 @@
 #include <cstdio>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include "vm.hpp"
 
 using namespace std;
+
+// #define DEBUG
 
 VM::VM() {
 }
@@ -29,11 +32,11 @@ int VM::load( std::string & path ) {
         file.read((char*)&mem, sizeof(this->mem));
 
         // Printamos a memória
-        for(int i = 0; i < size/2; i++ ) {
+        #ifdef DEBUG
+        for(int i = 0; i < size/2; i++ )
             cout << i << ":" << this->mem[i] << " ";
-        }
-
         cout << endl;
+        #endif
 
         return size/2;
     }
@@ -80,9 +83,11 @@ int VM::decode(int16_t * opId, int16_t * opsType, int16_t * op1, int16_t * op2) 
 
 // Essa função executa a próxima instrução.
 void VM::execute(int16_t opId, int16_t opsType, int16_t op1, int16_t op2) {
-    cout << "opId = " << opId << endl;
-    cout << "opsType = " << opsType << endl;
+    #ifdef DEBUG
+    cout << "opId = " << hex << uppercase << setfill('0') << setw(2) << opId << endl;
+    cout << "opsType = " << hex << uppercase << setfill('0') << setw(2) << opsType << endl;
     cout << "------------------------------" << endl;
+    #endif
 
     OperandsType type = static_cast<OperandsType>(opsType);
 
@@ -114,13 +119,19 @@ void VM::execute(int16_t opId, int16_t opsType, int16_t op1, int16_t op2) {
         case 20: this->htl_fn();break;
     }
 
+    #ifdef DEBUG
     cout << "==============================" << endl;
+    #endif
+
 }
 
 
 
 void VM::run(std::string & path) {
+    
+    #ifdef DEBUG
     cout << "file_path = " << path << endl;
+    #endif
 
     // Limpa máquina
     for(int j = 0; j < MEM_SIZE; j++) { this->mem[j] = 0; }
@@ -132,8 +143,9 @@ void VM::run(std::string & path) {
     // Começamos lendo o arquivo
     int size = load(path), i = 0;
 
+    #ifdef DEBUG
     cout << "size = " << size << endl;
-
+    #endif
     // Temos algo com o que trabalhar
     if(size > 0) {
         while(true) {
@@ -201,11 +213,15 @@ void VM::setVal(OperandsType type, int16_t op, int16_t val) {
     // Guarda resultado
     if(type == OperandsType::REG || type == OperandsType::REG_MEM || type == OperandsType::REG_REG || type == OperandsType::REG_VAL) {
         this->setRegVal(op, val);
+        #ifdef DEBUG 
         cout << "set val " << val << ":" << this->getRegVal(op) << " in reg " << op << endl;
+        #endif
     }
     else if(type == OperandsType::MEM || type == OperandsType::MEM_REG || type == OperandsType::MEM_VAL) {
         this->mem[op] = val;
+        #ifdef DEBUG 
         cout << "set val " << val << ":" << this->mem[op] << " in mem " << op << endl;
+        #endif
     }
 }
 
@@ -221,13 +237,17 @@ void VM::mov_fn( OperandsType type, int16_t op1, int16_t op2 ) {
     int16_t val1, val2;
     this->getVals(type, op1, op2, &val1, &val2);
 
+    #ifdef DEBUG 
     cout << "    vals : " << val1 << " : " << val2 << endl;
+    #endif
 
     this->setVal(type, op1, val2);
 }
 
 void VM::add_fn( OperandsType type, int16_t op1, int16_t op2 ) {
+    #ifdef DEBUG 
     cout << "add : " << (int)type << " : " << op1 << " : " << op2 << endl;
+    #endif
     int16_t val1, val2;
 
     this->getVals(type, op1, op2, &val1, &val2);
@@ -239,12 +259,16 @@ void VM::add_fn( OperandsType type, int16_t op1, int16_t op2 ) {
 }
 
 void VM::sub_fn( OperandsType type, int16_t op1, int16_t op2 ) {
+    #ifdef DEBUG 
     cout << "sub : " << (int)type << " : " << op1 << " : " << op2 << endl;
+    #endif
     int16_t val1, val2;
 
     this->getVals(type, op1, op2, &val1, &val2);
 
+    #ifdef DEBUG 
     cout << "    vals : " << val1 << " : " << val2 << endl;
+    #endif
 
     // Realiza a operação.
     val1 -= val2;
@@ -254,7 +278,9 @@ void VM::sub_fn( OperandsType type, int16_t op1, int16_t op2 ) {
 }
 
 void VM::and_fn( OperandsType type, int16_t op1, int16_t op2 ) {
+    #ifdef DEBUG 
     cout << "and : " << (int)type << " : " << op1 << " : " << op2 << endl;
+    #endif
     int16_t val1, val2;
 
     this->getVals(type, op1, op2, &val1, &val2);
@@ -268,7 +294,9 @@ void VM::and_fn( OperandsType type, int16_t op1, int16_t op2 ) {
 
 
 void VM::or_fn( OperandsType type, int16_t op1, int16_t op2 ) {
+    #ifdef DEBUG 
     cout << "or : " << (int)type << " : " << op1 << " : " << op2 << endl;
+    #endif
     int16_t val1, val2;
 
     this->getVals(type, op1, op2, &val1, &val2);
@@ -280,7 +308,9 @@ void VM::or_fn( OperandsType type, int16_t op1, int16_t op2 ) {
 }
 
 void VM::cmp_fn( OperandsType type, int16_t op1, int16_t op2 ) {
+    #ifdef DEBUG 
     cout << "cmp : " << (int)type << " : " << op1 << " : " << op2 << endl;
+    #endif
     int16_t val1, val2;
 
     this->getVals(type, op1, op2, &val1, &val2);
@@ -294,7 +324,9 @@ void VM::cmp_fn( OperandsType type, int16_t op1, int16_t op2 ) {
 }
 
 void VM::mul_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "mul : " << (int)type << " : " << op1 << endl;
+    #endif
     int16_t val1;
 
     // Se op1 é um registrador do tipo byte (AL, AH, BL, BH, CL, CH), então vamos
@@ -314,7 +346,9 @@ void VM::mul_fn( OperandsType type, int16_t op1 ) {
 }
 
 void VM::div_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "div : " << (int)type << " : " << op1 << endl;
+    #endif
     int16_t val1, val2;
 
     // Se op1 é um registrador do tipo byte (AL, AH, BL, BH, CL, CH), entao ...
@@ -340,7 +374,9 @@ void VM::div_fn( OperandsType type, int16_t op1 ) {
 }
 
 void VM::not_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "not : " << (int)type << " : " << op1 << endl;
+    #endif
     int16_t val1;
 
     this->getVals(type, op1, -1, &val1, NULL);
@@ -352,24 +388,33 @@ void VM::not_fn( OperandsType type, int16_t op1 ) {
 }
 
 void VM::jmp_fn( int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "jmp : " << op1 << endl;
+    #endif
+
     this->IP = op1;
 }
 
 void VM::jz_fn( int16_t op1 ) {
+    #ifdef DEBUG
     cout << "jz : " << op1 << endl;
+    #endif
 
     if(this->ZF) {this->IP = op1;}
 }
 
 void VM::js_fn( int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "js : " << op1 << endl;
+    #endif
 
     if(this->SF) {this->IP = op1;}
 }
 
 void VM::call_fn( int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "call : " << op1 << endl;
+    #endif
 
     // manual push
     this->mem[this->SP-1] = this->IP;
@@ -379,18 +424,24 @@ void VM::call_fn( int16_t op1 ) {
 }
 
 void VM::push_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "push : " << (int)type << " : " << op1 << endl;
+    #endif
     int16_t val1;
     this->getVals(type, op1, -1, &val1, NULL);
     this->mem[this->SP-1] = val1;
 
+    #ifdef DEBUG 
     cout << "    vals : " << val1 << " : " << this->mem[this->SP-1] << endl;
+    #endif
 
     this->SP -= 1;
 }
 
 void VM::pop_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "pop : " << (int)type << " : " << op1 << endl;
+    #endif
     if(this->SP == this->BP){return;}
 
     int16_t val1 = this->mem[this->SP];
@@ -399,28 +450,46 @@ void VM::pop_fn( OperandsType type, int16_t op1 ) {
 }
 
 void VM::read_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG 
     cout << "read : " << (int)type << " : " << op1 << endl;
+    #endif
     int16_t val;
     cout << "enter a value to read: ";
     cin >> hex >> val;
 
     // Armazenamos o valor.
-    if(type == OperandsType::REG) {setRegVal(op1, val); cout << "read value = " << getRegVal(op1) << endl;}
-    else if(type == OperandsType::MEM){this->mem[op1] = val; cout << "read value = " << this->mem[op1] << endl;}
+    if(type == OperandsType::REG) {
+        setRegVal(op1, val);
+        #ifdef DEBUG 
+        cout << "read value = " << getRegVal(op1) << endl;
+        #endif
+    }
+    else if(type == OperandsType::MEM){
+        this->mem[op1] = val;
+        #ifdef DEBUG 
+        cout << "read value = " << this->mem[op1] << endl;
+        #endif
+    }
 
     // Configuramos flags
     this->setFlags(val);
 }
 
 void VM::write_fn( OperandsType type, int16_t op1 ) {
+    #ifdef DEBUG
     cout << "write : " << (int)type << " : " << op1 << endl;
-
-    if(type == OperandsType::REG) {cout << "write reg : " << getRegVal(op1) << endl;}
-    else if(type == OperandsType::MEM){cout << "write mem : " << this->mem[op1] << endl;}
+    #endif
+    
+    if(type == OperandsType::REG)
+        cout << hex << uppercase << setfill('0') << setw(4) << getRegVal(op1) << endl;
+    else if(type == OperandsType::MEM)
+        cout << hex << uppercase << setfill('0') << setw(4) << this->mem[op1] << endl;
 }
 
 void VM::ret_fn() {
+    #ifdef DEBUG
     cout << "ret" << endl;
+    #endif
 
     // Manual pop
     int16_t val1 = this->mem[this->SP];
@@ -430,11 +499,25 @@ void VM::ret_fn() {
 }
 
 void VM::dump_fn() {
+    #ifdef DEBUG
     cout << "dump" << endl;
-    cout << this->AX << " " << this->BX << " " << this->CX << " " << this->SP << " " << this->BP << " " << this->IP << " " << this->ZF << " " << this->SF << " " << endl;
+    #endif
+    cout << hex << uppercase;
+    cout << "AX   BX   CX   SP   BP   IP   ZF   SF   " << endl;
+    cout <<
+        setfill('0') << setw(4) << this->AX << " " <<
+        setfill('0') << setw(4) << this->BX << " " <<
+        setfill('0') << setw(4) << this->CX << " " <<
+        setfill('0') << setw(4) << this->SP << " " <<
+        setfill('0') << setw(4) << this->BP << " " <<
+        setfill('0') << setw(4) << this->IP << " " <<
+        setfill('0') << setw(4) << this->ZF << " " <<
+        setfill('0') << setw(4) << this->SF << " " << endl;
 }
 
 void VM::htl_fn() {
+    #ifdef DEBUG
     cout << "htl" << endl;
+    #endif
     exit(0);
 }
