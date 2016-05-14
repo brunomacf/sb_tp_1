@@ -6,6 +6,7 @@
 
 using namespace std;
 
+// Comente para desativar o debug
 // #define DEBUG
 
 VM::VM() {
