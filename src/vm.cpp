@@ -30,7 +30,8 @@ int VM::load( std::string & path ) {
         }
 
         // Lê para a memória.
-        file.read((char*)&mem, sizeof(this->mem));
+        file.readsome((char*) &(this->IP), 2);
+        file.read((char*)&mem , sizeof(this->mem));
 
         // Printamos a memória
         #ifdef DEBUG
@@ -85,6 +86,7 @@ int VM::decode(int16_t * opId, int16_t * opsType, int16_t * op1, int16_t * op2) 
 // Essa função executa a próxima instrução.
 void VM::execute(int16_t opId, int16_t opsType, int16_t op1, int16_t op2) {
     #ifdef DEBUG
+    cout << "IP = " << hex << uppercase << setfill('0') << setw(2) << this->IP << endl;
     cout << "opId = " << hex << uppercase << setfill('0') << setw(2) << opId << endl;
     cout << "opsType = " << hex << uppercase << setfill('0') << setw(2) << opsType << endl;
     cout << "------------------------------" << endl;
